@@ -1,4 +1,5 @@
 import pygame
+import copy
 from globals import *
 
 class SnakeTile:
@@ -27,7 +28,10 @@ class SnakeTile:
 
 class Snake:
     def __init__(self, start_x, start_y):
+        self.start_x = start_x
+        self.start_y = start_y
         self.body = [SnakeTile(start_x, start_y, RED, "right")]
+        self.bodyPrev = []
         self.cool_down = 10 
         self.timer = self.cool_down 
 
@@ -40,12 +44,20 @@ class Snake:
         for i in range(len(self.body)-1, 0, -1):
             self.body[i].dir = self.body[i-1].dir
 
+    # Draws the snake on to the window
     def draw(self, window):
         for tile in self.body:
             tile.draw(window)
 
+    # Draws the snake in the previous position on to the window
+    def drawPrev(self, window):
+        for tile in self.bodyPrev:
+            tile.draw(window)
+
     # Sets the next x, y positions that the tiles should be at
     def move(self):
+        # Saving the old body for when the player loses
+        self.bodyPrev = copy.deepcopy(self.body)
         for tile in self.body:
             tile.move()
         if len(self.body) > 1:
@@ -74,7 +86,7 @@ class Snake:
         if len(self.body) > 1:
             for tile in self.body[1:]:
                 if self.body[0].get_coords() == tile.get_coords():
-                    print("Collided with own body!")
+                    # print("Collided with own body!")
                     return True
         return False
 
@@ -82,12 +94,19 @@ class Snake:
     def wall_collision(self):
         head_x, head_y = self.body[0].get_coords() 
         if (head_x < 2 or head_x + TILE_SIZE > WIDTH - 2):
-            print("Collided with left or right wall!")
+            # print("Collided with left or right wall!")
             return True
         if (head_y < 2 * TILE_SIZE + 1 or head_y + TILE_SIZE > HEIGHT-2):
-            print("Collided with top or bottom wall!")
+            # print("Collided with top or bottom wall!")
             return True
         return False
 
     def collision(self):
         return self.body_collision() or self.wall_collision()
+
+    # Resets the snake to the original
+    def reset(self):
+        self.body.clear()
+        self.bodyPrev.clear()
+        self.timer = self.cool_down
+        self.body.append(SnakeTile(self.start_x, self.start_y, RED, "right"))

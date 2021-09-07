@@ -26,6 +26,7 @@ def game():
     food.init_coords()
     score = 0
     score_font = pygame.font.SysFont("comicsans", TILE_SIZE * 2)
+    over = False
 
     def redraw_window():
         # Draw Background
@@ -40,20 +41,21 @@ def game():
                 food.set_coords()
             food.flip_exists()
 
-        snake.draw(WINDOW)
-        if snake.timer == snake.cool_down:
-            snake.move()
-            snake.timer = 0
+        if not over:
+            snake.draw(WINDOW)
         else:
-            snake.timer += 1
+            snake.drawPrev(WINDOW)
+            pygame.draw.rect(WINDOW, NAVY, (90,90,90,90))
 
         pygame.display.update()
 
     while(run):
         clock.tick(FPS)
-        redraw_window()
+
         if snake.collision():
-            run = False
+            over = True
+
+        redraw_window()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -76,3 +78,10 @@ def game():
             score += 1
             snake.add_tile()
             food.flip_exists()
+        
+        if not over:
+            if snake.timer == snake.cool_down:
+                snake.move()
+                snake.timer = 0
+            else:
+                snake.timer += 1

@@ -59,6 +59,7 @@ def menu():
             if event.type == pygame.QUIT:
                 quit()
         if ticks == cool_down:
+            # Floating effect for the title bar
             if increase:
                 dynamic_offset = add_tuples(dynamic_offset, (0,1))
             else:
